@@ -38,6 +38,9 @@ use granovetter_ties::simulation::{
 struct Cli {
     #[command(subcommand)]
     command: Commands,
+    /// Development run: write it under results/_scratch/ so it is never synced to the vault.
+    #[arg(long, global = true)]
+    scratch: bool,
 }
 
 #[derive(Subcommand, Debug)]
@@ -233,7 +236,7 @@ fn run_seed(root: u64, run_idx: usize) -> u64 {
 // run
 // ---------------------------------------------------------------------------
 
-fn cmd_run(args: RunArgs) {
+fn cmd_run(args: RunArgs, scratch: bool) {
     let diffusion = parse_diffusion(&args.diffusion).unwrap_or_else(|e| panic!("{}", e));
 
     // シードを実体化してから記録する．--seed 省略時にシミュレーション側で
@@ -260,6 +263,7 @@ fn cmd_run(args: RunArgs) {
     let parameters = cfg.to_parameters(args.runs, root);
     let mut rv = Run::start(
         RunOptions::new(EXPERIMENT, "run")
+            .scratch(scratch)
             .repo_id(REPO_ID)
             .domain(DOMAIN)
             .results_root(&args.output_dir)
@@ -374,7 +378,7 @@ fn cmd_run(args: RunArgs) {
 // ablation
 // ---------------------------------------------------------------------------
 
-fn cmd_ablation(args: AblationArgs) {
+fn cmd_ablation(args: AblationArgs, scratch: bool) {
     let diffusion = parse_diffusion(&args.diffusion).unwrap_or_else(|e| panic!("{}", e));
     let remove = parse_remove(&args.remove).unwrap_or_else(|e| panic!("{}", e));
 
@@ -397,6 +401,7 @@ fn cmd_ablation(args: AblationArgs) {
     let parameters = cfg.to_parameters(args.runs, args.seed);
     let mut rv = Run::start(
         RunOptions::new(EXPERIMENT, "ablation")
+            .scratch(scratch)
             .repo_id(REPO_ID)
             .domain(DOMAIN)
             .results_root(&args.output_dir)
@@ -520,7 +525,7 @@ struct SweepParameters {
     seed: u64,
 }
 
-fn cmd_sweep(args: SweepArgs) {
+fn cmd_sweep(args: SweepArgs, scratch: bool) {
     let diffusion = parse_diffusion(&args.diffusion).unwrap_or_else(|e| panic!("{}", e));
 
     let thetas: Vec<f64> = args
@@ -565,6 +570,7 @@ fn cmd_sweep(args: SweepArgs) {
     // runvault が親の run_slug で埋める．
     let parent = Run::start(
         RunOptions::new(EXPERIMENT, "sweep")
+            .scratch(scratch)
             .repo_id(REPO_ID)
             .domain(DOMAIN)
             .results_root(&args.output_dir)
@@ -629,6 +635,7 @@ fn cmd_sweep(args: SweepArgs) {
             // 同じ条件の繰り返しは無いので replicate_index は 0．
             let mut child = Run::start(
                 RunOptions::new(EXPERIMENT, "sweep-point")
+                    .scratch(scratch)
                     .repo_id(REPO_ID)
                     .domain(DOMAIN)
                     .results_root(&args.output_dir)
@@ -696,19 +703,21 @@ fn args_default_theta() -> f64 {
 
 fn main() {
     let cli = Cli::parse();
+    let scratch = cli.scratch;
     match cli.command {
-        Commands::Run(args) => cmd_run(args),
-        Commands::Ablation(args) => cmd_ablation(args),
-        Commands::Sweep(args) => cmd_sweep(args),
-        Commands::Reproduce(args) => cmd_reproduce(args),
+        Commands::Run(args) => cmd_run(args, scratch),
+        Commands::Ablation(args) => cmd_ablation(args, scratch),
+        Commands::Sweep(args) => cmd_sweep(args, scratch),
+        Commands::Reproduce(args) => cmd_reproduce(args, scratch),
     }
 }
 
 /// 論文主要主張の一括再現を実行する．
-fn cmd_reproduce(args: ReproduceArgs) {
+fn cmd_reproduce(args: ReproduceArgs, scratch: bool) {
     run_reproduce(&ReproduceOptions {
         output_dir: args.output_dir,
         seed: args.seed,
         quick: args.quick,
+        scratch,
     });
 }

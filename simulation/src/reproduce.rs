@@ -199,6 +199,7 @@ pub struct ReproduceOptions {
     pub output_dir: String,
     pub seed: u64,
     pub quick: bool,
+    pub scratch: bool,
 }
 
 /// `reproduce` run の `parameters` — 両 claim が使う条件をまとめて持つ．
@@ -262,6 +263,7 @@ pub fn run_reproduce(opts: &ReproduceOptions) {
 
     let mut rv = Run::start(
         RunOptions::new(EXPERIMENT, "reproduce")
+            .scratch(opts.scratch)
             .repo_id(REPO_ID)
             .domain(DOMAIN)
             .results_root(&opts.output_dir)
@@ -544,6 +546,7 @@ mod tests {
             output_dir: dir.to_string(),
             seed: 42,
             quick: true,
+            scratch: false,
         }
     }
 
