@@ -20,7 +20,7 @@ use crate::metrics::Metrics;
 /// runvault 上の実験名．`runvault path --experiment` に渡す値でもある．
 pub const EXPERIMENT: &str = "granovetter";
 /// リポジトリの安定 id．git remote の名前とは独立に固定する．
-pub const REPO_ID: &str = "granovetter1973";
+pub const REPO_ID: &str = "rep-granovetter1973";
 /// 分野．網生成・シード選択・SI の感染判定で乱数を引くので `simulation`
 /// (= `master_seed` が必須)．`reproduce` も内部で同じ拡散を回すので同じ分野で，
 /// 乱数を使わない突き合わせだけの `analysis` ではない．
@@ -39,7 +39,7 @@ pub const ABLATION_CONDITION_EVENT: &str = "x.granovetter1973.ablation_condition
 pub const THRESHOLD_POINT_EVENT: &str = "x.granovetter1973.threshold_point";
 
 /// 設計書 (Obsidian)．
-const OBSIDIAN_NOTE: &str = "研究/98_論文レポート/80-再現実験/実装完了/granovetter1973/設計書.md";
+const OBSIDIAN_NOTE: &str = "研究/98_論文レポート/80-再現実験/実装完了/rep-granovetter1973/設計書.md";
 
 /// 対象論文の書誌．
 fn work() -> Work {
